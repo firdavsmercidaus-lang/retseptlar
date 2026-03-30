@@ -30,7 +30,6 @@ export default function App() {
   const [selectedSubCategory, setSelectedSubCategory] = useState('Barchasi');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState('');
 
   const categories = ['Barchasi', ...Array.from(new Set(recipes.map(r => r.category)))];
   const countries = ['Barchasi', ...Array.from(new Set(recipes.map(r => r.country)))];
@@ -63,25 +62,6 @@ export default function App() {
   const handleCountryClick = (country: string) => {
     setSelectedCountry(country);
     setSelectedSubCategory('Barchasi');
-  };
-
-  const handleAiGenerate = async () => {
-    if (!aiPrompt.trim()) return;
-    setIsGenerating(true);
-    try {
-      const newRecipe = await generateRecipe(aiPrompt);
-      if (newRecipe) {
-        setRecipes(prev => [newRecipe, ...prev]);
-        setSelectedRecipe(newRecipe);
-        setAiPrompt('');
-      } else {
-        alert("Retsept yaratishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.");
-      }
-    } catch (err) {
-      alert("Server bilan bog'lanishda xatolik yuz berdi.");
-    } finally {
-      setIsGenerating(false);
-    }
   };
 
   return (
@@ -141,48 +121,28 @@ export default function App() {
                     type="text" 
                     placeholder="Masalan: 'Tandir go'sht' yoki 'Andijon polovi'..."
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:outline-none focus:border-blue-400/50 transition-all"
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30">
-                    <Sparkles size={20} />
+                    <Search size={20} />
                   </div>
                 </div>
                 <button 
-                  onClick={handleAiGenerate}
-                  disabled={isGenerating}
-                  className="px-8 py-4 rounded-xl bg-blue-400 text-black font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(96,165,250,0.4)] transition-all disabled:opacity-50"
+                  className="px-8 py-4 rounded-xl bg-blue-400 text-black font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(96,165,250,0.4)] transition-all"
                 >
-                  {isGenerating ? (
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                    >
-                      <Zap size={20} />
-                    </motion.div>
-                  ) : <Zap size={20} />}
-                  SINTEZ QILISH
+                  <Search size={20} />
+                  QIDIRISH
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Search & Filters */}
+        {/* Filters */}
         <section className="mb-12">
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
-              <input 
-                type="text" 
-                placeholder="Retseptlarni qidirish..."
-                className="w-full bg-white/5 border border-white/10 rounded-full pl-12 pr-6 py-3 focus:outline-none focus:border-blue-400/50"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-4 w-full md:w-auto">
+            <div className="flex flex-col gap-4 w-full">
               <div className="flex items-center gap-3 overflow-x-auto pb-2 custom-scrollbar">
                 <Filter size={18} className="text-white/40 shrink-0" />
                 <div className="flex gap-2 border-r border-white/10 pr-4">
